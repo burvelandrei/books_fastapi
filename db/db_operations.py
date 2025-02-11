@@ -4,16 +4,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import Book, Author
 from schemas.books_schemas import BooksCreate
 from schemas.authors_schemas import AuthorsCreate
+from fastapi import HTTPException
 
 
 async def get_all_books(db: AsyncSession):
-    result = await db.execute(select(Book))
-    return result.scalars().all()
+    books = await db.execute(select(Book))
+    return books.scalars().all()
 
 
-async def get_book_by_id(db: AsyncSession, id: int):
-    result = await db.execute(select(Book).where(Book.id == id))
-    return result.scalar_one_or_none()
+async def get_book_by_id(id: int, db: AsyncSession):
+    book = await db.execute(select(Book).where(Book.id == id))
+    return book.scalar_one_or_none()
 
 
 async def create_book(book_data: BooksCreate, db: AsyncSession):
@@ -28,15 +29,18 @@ async def create_book(book_data: BooksCreate, db: AsyncSession):
     await db.refresh(book)
     return book
 
+async def delete_book(book, db: AsyncSession):
+    await db.delete(book)
+    await db.commit()
 
 async def get_all_authors(db: AsyncSession):
-    result = await db.execute(select(Author))
-    return result.scalars().all()
+    authors = await db.execute(select(Author))
+    return authors.scalars().all()
 
 
-async def get_author_by_id(db: AsyncSession, id: int):
-    result = await db.execute(select(Author).where(Author.id == id))
-    return result.scalar_one_or_none()
+async def get_author_by_id(id: int, db: AsyncSession):
+    author = await db.execute(select(Author).where(Author.id == id))
+    return author.scalar_one_or_none()
 
 
 async def create_author(author_data: AuthorsCreate, db: AsyncSession):
@@ -49,3 +53,8 @@ async def create_author(author_data: AuthorsCreate, db: AsyncSession):
     await db.commit()
     await db.refresh(author)
     return author
+
+
+async def delete_author(author, db: AsyncSession):
+    await db.delete(author)
+    await db.commit()
