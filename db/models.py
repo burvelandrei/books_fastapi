@@ -7,28 +7,26 @@ class Base(DeclarativeBase):
     pass
 
 
-class BaseMixin:
-    """Миксин для добавления ID и created_at во все модели"""
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-
-class Book(Base, BaseMixin):
+class Book(Base):
     __tablename__ = "book"
 
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
     date_publication = Column(Date, nullable=True)
     author_id = Column(Integer, ForeignKey("author.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     author = relationship("Author", back_populates="books")
 
 
-class Author(Base, BaseMixin):
+class Author(Base):
     __tablename__ = "author"
 
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), nullable=False)
     alias = Column(String(100), nullable=True)
     country = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     books = relationship("Book", back_populates="author")
